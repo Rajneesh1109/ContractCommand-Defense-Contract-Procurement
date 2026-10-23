@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluate {{ vendor.name }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-award-fill me-2 text-warning"></i>Defense Contractor Performance Scorecard: {{ vendor.name }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <div class="alert alert-info py-2 small mb-4">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Scores are weighted according to Defense Procurement Procedure guidelines:
+                    <strong>Technical (25%) + Quality (25%) + Delivery (20%) + Compliance (15%) + Cost (15%)</strong>.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">EVALUATION AUDIT DATE</label>
+                        {{ form.evaluation_date }}
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Multi-Criteria Dimension Scores (0 - 100)</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">TECHNICAL CAPABILITY (25%)</label>
+                            {{ form.technical_score }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">MANUFACTURING QUALITY (25%)</label>
+                            {{ form.quality_score }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">DELIVERY TIMELINESS (20%)</label>
+                            {{ form.delivery_score }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">SECURITY & ITAR COMPLIANCE (15%)</label>
+                            {{ form.compliance_score }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">COST COMPETITIVENESS (15%)</label>
+                            {{ form.cost_score }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Auditor Qualitative Observations</h6>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">PROVEN STRENGTHS & CORE CAPABILITIES</label>
+                        {{ form.strengths }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">RISK ASSESSMENT & SUPPLY CHAIN BOTTLENECKS</label>
+                        {{ form.risk_assessment }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">RECOMMENDED CORRECTIVE ACTIONS / CLEARANCE TIER</label>
+                        {{ form.recommendations }}
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'vendor_detail' pk=vendor.pk %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-calculator me-1 text-warning"></i> Compute Weighted Score & Update Rating
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

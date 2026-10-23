@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ cert.certificate_number }} // DD-250 Inspection Report{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <div>
+        <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary btn-sm me-2">
+            <i class="bi bi-arrow-left me-1"></i>Back to Inspections
+        </a>
+        <span class="badge badge-defense clearance-secret">OFFICIAL DEFENSE RECORD</span>
+    </div>
+    <div>
+        <button onclick="window.print()" class="btn btn-dark btn-sm">
+            <i class="bi bi-printer me-1 text-warning"></i> Print Official DD-250
+        </button>
+    </div>
+</div>
+
+<!-- Printable DD-250 Military Form Layout -->
+<div class="card shadow border-dark mb-4">
+    <div class="card-header bg-dark text-white text-center py-3 border-bottom border-warning">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-start">
+                <small class="text-secondary text-uppercase fw-bold">MINISTRY OF DEFENSE // DGQA</small>
+                <div class="fw-bold font-monospace">FORM DD-250 (REV. 2026)</div>
+            </div>
+            <div class="text-center">
+                <i class="bi bi-shield-shaded text-warning fs-3"></i>
+                <h5 class="mb-0 fw-bold">MATERIAL INSPECTION AND RECEIVING REPORT</h5>
+                <small class="text-secondary">DEFENSE CONTRACT ACCEPTANCE CERTIFICATE</small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-danger fs-6 text-uppercase">{{ cert.get_status_display }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4 bg-white">
+        <!-- Boxed Form Grid -->
+        <div class="row g-0 border border-dark mb-3">
+            <div class="col-md-6 p-2 border-end border-bottom border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">1. PROCUREMENT CONTRACT NUMBER</small>
+                <strong class="fs-6 font-monospace">{{ cert.contract.contract_number }}</strong>
+            </div>
+            <div class="col-md-6 p-2 border-bottom border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">2. CERTIFICATE NUMBER / TRACKING</small>
+                <strong class="fs-6 font-monospace">{{ cert.certificate_number }}</strong>
+            </div>
+            <div class="col-md-6 p-2 border-end border-bottom border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">3. PRIME DEFENSE CONTRACTOR</small>
+                <strong class="text-dark">{{ cert.contract.vendor.name }}</strong>
+                <div class="small text-muted">CAGE Code: {{ cert.contract.vendor.cage_code|default:'N/A' }} | Clearance: {{ cert.contract.vendor.get_security_clearance_display }}</div>
+            </div>
+            <div class="col-md-6 p-2 border-bottom border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">4. INSPECTION FACILITY / PROVING GROUND</small>
+                <strong class="text-dark">{{ cert.inspection_location }}</strong>
+                <div class="small text-muted">Test Date: {{ cert.inspection_date }}</div>
+            </div>
+            <div class="col-md-6 p-2 border-end border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">5. CONTRACT MILESTONE DELIVERABLE</small>
+                <strong class="text-dark">M{{ cert.milestone.milestone_number }}: {{ cert.milestone.title }}</strong>
+                <div class="small text-muted">Milestone Value: ₹{{ cert.milestone.milestone_amount }}</div>
+            </div>
+            <div class="col-md-6 p-2 border-dark">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">6. QUALITY ASSURANCE REPORT REFERENCE</small>
+                <strong class="font-monospace text-primary">{{ cert.qa_report_number|default:'DGQA-VER-2026' }}</strong>
+            </div>
+        </div>
+
+        <!-- Technical Findings -->
+        <div class="border border-dark p-3 mb-4">
+            <small class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem;">
+                7. TECHNICAL INSPECTION FINDINGS, TOLERANCE READINGS & MIL-SPEC CONFORMANCE
+            </small>
+            <p class="mb-0 text-dark font-monospace small" style="white-space: pre-line;">{{ cert.findings_and_notes }}</p>
+        </div>
+
+        <!-- Digital Signature & Inspector Stamp Box -->
+        <div class="row g-3 border border-dark p-3 bg-light">
+            <div class="col-md-7">
+                <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.72rem;">8. MILITARY ACCEPTANCE CERTIFICATION</small>
+                <p class="small text-secondary mb-2">
+                    I hereby certify that the items listed herein have been inspected by me or under my supervision, tested in accordance with defense standards, and conform in all respects to the contract specifications.
+                </p>
+                <div class="small">
+                    <strong>Authorized Inspector:</strong> {{ cert.inspector.get_full_name|default:cert.inspector.username }}<br>
+                    <strong>Designation / Command:</strong> {{ cert.inspector.get_role_display }} ({{ cert.inspector.department }})<br>
+                    <strong>Service ID:</strong> {{ cert.inspector.service_id|default:'QA-DIR-MOD' }}
+                </div>
+            </div>
+            <div class="col-md-5 border-start border-dark ps-4">
+                <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size: 0.72rem;">9. CRYPTOGRAPHIC INTEGRITY STAMP</small>
+                <div class="p-2 bg-white border font-monospace text-break" style="font-size: 0.68rem;">
+                    SHA256: {{ cert.digital_signature }}
+                </div>
+                <div class="text-center mt-3">
+                    <span class="badge bg-success-subtle text-success border border-success p-2">
+                        <i class="bi bi-shield-fill-check fs-5 me-1"></i> DIGITALLY SIGNED & VERIFIED
+                    </span>
+                    <div class="text-muted" style="font-size: 0.68rem; margin-top: 4px;">TIMESTAMP: {{ cert.created_at|date:"Y-m-d H:i:s T" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

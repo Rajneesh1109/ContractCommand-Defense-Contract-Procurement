@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ vendor.name }} // Contractor Dossier{% endblock %}
+
+{% block content %}
+<!-- Dossier Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge badge-defense clearance-{{ vendor.security_clearance|lower }}">
+                <i class="bi bi-shield-lock-fill me-1"></i>{{ vendor.get_security_clearance_display }}
+            </span>
+            <span class="badge bg-dark">{{ vendor.get_tier_display }}</span>
+            <span class="badge bg-secondary">{{ vendor.vendor_code }}</span>
+        </div>
+        <h3 class="fw-bold mb-0 text-dark">{{ vendor.name }}</h3>
+        <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i>{{ vendor.address }}, {{ vendor.country }}</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{% url 'vendor_evaluation_create' vendor_pk=vendor.pk %}" class="btn btn-warning btn-sm fw-bold">
+            <i class="bi bi-stars me-1"></i>Evaluate Performance
+        </a>
+        <a href="{% url 'vendor_edit' pk=vendor.pk %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-pencil me-1"></i>Edit Profile
+        </a>
+        <a href="{% url 'vendor_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+</div>
+
+<!-- Details & Scores Grid -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-file-earmark-person me-2 text-warning"></i>Compliance & Facility Security
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">CAGE / NCAGE:</span>
+                        <strong class="font-monospace">{{ vendor.cage_code|default:'N/A' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">D-U-N-S Number:</span>
+                        <strong class="font-monospace">{{ vendor.duns_number|default:'N/A' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Security Clearance Expiry:</span>
+                        <strong>{{ vendor.clearance_expiry|default:'Perpetual Active' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">ITAR / EAR Compliant:</span>
+                        {% if vendor.itar_compliant %}
+                            <span class="badge bg-success-subtle text-success"><i class="bi bi-check-lg me-1"></i>Verified</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger">Non-Compliant</span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Quality Certifications:</span>
+                        <span class="fw-semibold text-end">{{ vendor.certifications }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Point of Contact:</span>
+                        <strong>{{ vendor.contact_person }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Direct Email:</span>
+                        <a href="mailto:{{ vendor.email }}">{{ vendor.email }}</a>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Secure Comm Phone:</span>
+                        <span>{{ vendor.phone }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Rating & Score Gauge -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-award me-2 text-warning"></i>Performance Rating & Defense Scorecard</span>
+                <span class="badge bg-warning text-dark fs-6">{{ vendor.performance_rating }} / 100</span>
+            </div>
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Historical Evaluation Scorecards ({{ evaluations|length }})</h5>
+                
+                {% for ev in evaluations %}
+                <div class="p-3 bg-light rounded border mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>Audit Date: {{ ev.evaluation_date }}</strong>
+                            <small class="text-muted ms-2">Auditor: {{ ev.evaluator.username|default:'General Staff' }}</small>
+                        </div>
+                        <span class="badge bg-dark fs-6">Weighted Score: {{ ev.overall_score }}%</span>
+                    </div>
+
+                    <div class="row g-2 text-center my-2 small">
+                        <div class="col-2 border-end">
+                            <div class="text-muted">Technical (25%)</div>
+                            <div class="fw-bold fs-6">{{ ev.technical_score }}%</div>
+                        </div>
+                        <div class="col-2 border-end">
+                            <div class="text-muted">Quality (25%)</div>
+                            <div class="fw-bold fs-6">{{ ev.quality_score }}%</div>
+                        </div>
+                        <div class="col-2 border-end">
+                            <div class="text-muted">Delivery (20%)</div>
+                            <div class="fw-bold fs-6">{{ ev.delivery_score }}%</div>
+                        </div>
+                        <div class="col-3 border-end">
+                            <div class="text-muted">Compliance (15%)</div>
+                            <div class="fw-bold fs-6">{{ ev.compliance_score }}%</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="text-muted">Cost Efficiency (15%)</div>
+                            <div class="fw-bold fs-6">{{ ev.cost_score }}%</div>
+                        </div>
+                    </div>
+
+                    {% if ev.strengths %}
+                    <div class="mt-2 small text-secondary">
+                        <strong class="text-dark">Strengths:</strong> {{ ev.strengths }}
+                    </div>
+                    {% endif %}
+                    {% if ev.risk_assessment %}
+                    <div class="mt-1 small text-secondary">
+                        <strong class="text-danger">Risk Assessment:</strong> {{ ev.risk_assessment }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-muted my-4 text-center">No evaluations recorded yet. Click "Evaluate Performance" above to submit an assessment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Defense Contracts Awarded to this Vendor -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header card-header-tactical">
+        <i class="bi bi-folder2-open me-2 text-warning"></i>Defense Contracts Awarded ({{ contracts|length }})
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Contract #</th>
+                        <th>Scope & Title</th>
+                        <th>Security Level</th>
+                        <th>Total Value</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contracts %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'contract_detail' pk=c.pk %}" class="fw-bold text-decoration-none">
+                                {{ c.contract_number }}
+                            </a>
+                        </td>
+                        <td>{{ c.title }}</td>
+                        <td>
+                            <span class="badge badge-defense clearance-{{ c.security_classification|lower }}">
+                                {{ c.get_security_classification_display }}
+                            </span>
+                        </td>
+                        <td class="fw-bold text-dark">₹{{ c.total_contract_value|intcomma }}</td>
+                        <td><span class="badge bg-secondary">{{ c.get_contract_status_display }}</span></td>
+                        <td>{{ c.start_date }}</td>
+                        <td>{{ c.end_date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">No defense contracts awarded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

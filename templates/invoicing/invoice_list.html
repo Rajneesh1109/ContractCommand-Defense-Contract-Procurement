@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Defense Invoices & Claims // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <h3 class="fw-bold mb-1 text-slate-900">
+            <i class="bi bi-receipt-cutoff text-warning me-2"></i>Invoices, 3-Way Match & Treasury Disbursements
+        </h3>
+        <p class="text-muted mb-0 small">
+            Contractor payment claims, three-way reconciliation (Contract + DD-250 + Claim), and PCDA treasury release.
+        </p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{% url 'export_invoices' %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-download me-1"></i>Export Ledger CSV
+        </a>
+        <a href="{% url 'invoice_create' %}" class="btn btn-dark btn-sm">
+            <i class="bi bi-receipt me-1 text-warning"></i>Generate Claim
+        </a>
+    </div>
+</div>
+
+<!-- Summary Ribbon -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="p-3 bg-white rounded border shadow-sm">
+            <span class="text-muted small text-uppercase fw-bold">Total Gross Claims</span>
+            <h4 class="fw-bold text-dark mt-1">₹{{ total_gross|intcomma }}</h4>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="p-3 bg-white rounded border shadow-sm">
+            <span class="text-muted small text-uppercase fw-bold">Net Payable (After 5% Retention)</span>
+            <h4 class="fw-bold text-success mt-1">₹{{ total_net|intcomma }}</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body bg-white p-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search invoice #, contract #, contractor name..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-5">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Payment Stages</option>
+                    {% for code, label in statuses %}
+                        <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-dark btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'invoice_list' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Invoices Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-header card-header-tactical">
+        <i class="bi bi-table me-2 text-warning"></i>Payment Claims Register ({{ invoices|length }})
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Contract & Vendor</th>
+                        <th>Milestone Claim</th>
+                        <th>Gross Amount</th>
+                        <th>5% Retention</th>
+                        <th>Net Payable</th>
+                        <th>Payment Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in invoices %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'invoice_detail' pk=inv.pk %}" class="fw-bold text-decoration-none text-dark">
+                                {{ inv.invoice_number }}
+                            </a>
+                            <small class="text-muted d-block">{{ inv.invoice_date }}</small>
+                        </td>
+                        <td>
+                            <a href="{% url 'contract_detail' pk=inv.contract.pk %}" class="text-decoration-none fw-semibold text-dark">
+                                {{ inv.contract.contract_number }}
+                            </a>
+                            <small class="text-muted d-block"><i class="bi bi-building me-1"></i>{{ inv.vendor.name }}</small>
+                        </td>
+                        <td>
+                            {% if inv.milestone %}
+                            <span class="badge bg-dark me-1">M{{ inv.milestone.milestone_number }}</span>
+                            <small>{{ inv.milestone.title|truncatechars:30 }}</small>
+                            {% else %}
+                            <span class="text-muted small">Non-milestone claim</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-semibold">₹{{ inv.gross_amount|intcomma }}</td>
+                        <td class="text-danger small">-₹{{ inv.withholding_amount|intcomma }}</td>
+                        <td class="fw-bold text-dark">₹{{ inv.net_payable_amount|intcomma }}</td>
+                        <td>
+                            {% if inv.payment_status == 'PAID' %}
+                                <span class="badge bg-success">Settled & Paid</span>
+                            {% elif inv.payment_status == 'THREE_WAY_MATCH_VERIFIED' %}
+                                <span class="badge bg-info text-dark">3-Way Verified</span>
+                            {% elif inv.payment_status == 'AUDIT_APPROVED' %}
+                                <span class="badge bg-primary">Audit Approved</span>
+                            {% elif inv.payment_status == 'SUBMITTED' %}
+                                <span class="badge bg-warning text-dark">Submitted</span>
+                            {% elif inv.payment_status == 'DISPUTED' %}
+                                <span class="badge bg-danger">Disputed</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ inv.get_payment_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'invoice_detail' pk=inv.pk %}" class="btn btn-xs btn-outline-dark">
+                                Process <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No invoices recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

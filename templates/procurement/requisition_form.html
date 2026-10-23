@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-file-earmark-plus me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">REQUISITION NUMBER *</label>
+                            {{ form.requisition_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DEMANDING SERVICE / COMMAND UNIT *</label>
+                            {{ form.demanding_service }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">REQUISITION TITLE *</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE DOMAIN / CATEGORY *</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">OPERATIONAL PRIORITY *</label>
+                            {{ form.priority }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">REQUIRED DEPLOYMENT DATE *</label>
+                            {{ form.required_by_date }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">OPERATIONAL JUSTIFICATION & THREAT MATRIX *</label>
+                            {{ form.justification }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">ESTIMATED BUDGET ALLOCATION (INR)</label>
+                            {{ form.estimated_total_cost }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'requisition_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-save me-1 text-warning"></i> Submit Requisition
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

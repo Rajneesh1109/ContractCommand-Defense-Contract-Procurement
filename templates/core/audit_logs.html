@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Defense Audit Trail // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <h3 class="fw-bold mb-1 text-slate-900">
+            <i class="bi bi-shield-check text-warning me-2"></i>Defense Compliance Audit Trail
+        </h3>
+        <p class="text-muted mb-0 small">
+            Cryptographically sealed and tamper-evident logs for all procurement decisions, state transitions, quality certifications, and treasury disbursements.
+        </p>
+    </div>
+    <div class="mt-3 mt-md-0">
+        <a href="{% url 'export_audit_logs' %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-download me-1"></i>Export CSV Audit Log
+        </a>
+    </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body bg-white p-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Search target, ID, or action..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="module" class="form-select form-select-sm">
+                    <option value="">All Security Modules</option>
+                    {% for m in modules %}
+                        <option value="{{ m }}" {% if selected_module == m %}selected{% endif %}>{{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark btn-sm w-100">Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'audit_logs' %}" class="btn btn-outline-secondary btn-sm w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Logs Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-header card-header-tactical">
+        <i class="bi bi-list-columns-reverse me-2 text-warning"></i>Audit Event Records (Showing latest {{ logs|length }} events)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 font-monospace" style="font-size: 0.85rem;">
+                <thead class="table-light text-uppercase">
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User (Officer)</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Target ID</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="text-nowrap text-secondary">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                        <td>
+                            {% if log.user %}
+                                <div class="fw-bold text-dark">{{ log.user.username }}</div>
+                                <small class="text-muted">{{ log.user.get_role_display }}</small>
+                            {% else %}
+                                <span class="text-muted">System Automator</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ log.module }}</span></td>
+                        <td><span class="badge bg-dark-subtle text-dark border">{{ log.action }}</span></td>
+                        <td class="fw-bold">{{ log.target_id|default:'-' }}</td>
+                        <td class="font-sans text-secondary">{{ log.details|truncatechars:100 }}</td>
+                        <td class="text-muted small">{{ log.ip_address|default:'127.0.0.1' }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No audit events matching criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

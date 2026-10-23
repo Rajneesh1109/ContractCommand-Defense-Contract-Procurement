@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ requisition.requisition_number }} // Requisition Dossier{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-dark">{{ requisition.requisition_number }}</span>
+            <span class="badge bg-secondary">{{ requisition.get_category_display }}</span>
+            {% if requisition.priority == 'CRITICAL_OPERATIONAL' %}
+                <span class="badge bg-danger">Critical Operational</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">{{ requisition.get_priority_display }}</span>
+            {% endif %}
+        </div>
+        <h3 class="fw-bold mb-0 text-dark">{{ requisition.title }}</h3>
+        <p class="text-muted small mb-0"><i class="bi bi-shield me-1"></i>Demand Unit: <strong>{{ requisition.demanding_service }}</strong></p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+        {% if requisition.status == 'APPROVED' %}
+        <a href="{% url 'tender_create' %}?req_id={{ requisition.pk }}" class="btn btn-warning btn-sm fw-bold">
+            <i class="bi bi-megaphone me-1"></i>Issue RFP / Tender
+        </a>
+        {% endif %}
+        <a href="{% url 'requisition_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Requisition Data -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-info-circle me-2 text-warning"></i>Operational Need & Defense Justification
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">{{ requisition.justification }}</p>
+
+                <div class="row g-3 mt-3 pt-3 border-top small">
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Estimated Budget:</span>
+                        <strong class="fs-5 text-dark">₹{{ requisition.estimated_total_cost|intcomma }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Required Deployment Date:</span>
+                        <strong class="fs-6 text-dark">{{ requisition.required_by_date }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Initiated By:</span>
+                        <span>{{ requisition.created_by.get_full_name|default:requisition.created_by.username }} ({{ requisition.created_at|date:"M d, Y" }})</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Current Status:</span>
+                        <span class="badge bg-dark">{{ requisition.get_status_display }}</span>
+                    </div>
+                </div>
+
+                {% if requisition.approval_notes %}
+                <div class="mt-3 p-3 bg-light rounded border">
+                    <div class="fw-bold small text-dark"><i class="bi bi-check-circle-fill text-success me-1"></i>Approval Endorsement:</div>
+                    <p class="mb-0 small text-secondary">{{ requisition.approval_notes }}</p>
+                    <small class="text-muted">Approved by {{ requisition.approved_by.username }} on {{ requisition.approval_date }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Approvals & Workflow Box -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-check2-square me-2 text-warning"></i>Directorate Approval Workflow
+            </div>
+            <div class="card-body">
+                {% if requisition.status == 'DRAFT' or requisition.status == 'SUBMITTED' %}
+                <form method="post" action="{% url 'requisition_approve' pk=requisition.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">AUTHORIZATION / DIRECTIVE NOTES</label>
+                        <textarea name="approval_notes" class="form-control form-control-sm" rows="3" placeholder="Reference Defense Acquisition Council (DAC) / Staff clearance minutes..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="action" value="APPROVE" class="btn btn-success btn-sm flex-grow-1 fw-bold">
+                            <i class="bi bi-check-lg me-1"></i>Approve Requisition
+                        </button>
+                        <button type="submit" name="action" value="REJECT" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-x-lg me-1"></i>Reject
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-success d-flex align-items-center mb-0">
+                    <i class="bi bi-shield-check fs-2 me-3 text-success"></i>
+                    <div>
+                        <strong class="d-block text-dark">Approved by Defense Acquisition Directorate</strong>
+                        <small class="text-muted">Cleared for issuing Request For Proposal (RFP) / Tender.</small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Requisition Line Items & Add Line Item -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header card-header-tactical d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-box-seam me-2 text-warning"></i>Requisition Equipment Line Items ({{ requisition.items.count }})</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Nomenclature / Description</th>
+                        <th>Catalog NSN</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in requisition.items.all %}
+                    <tr>
+                        <td class="fw-semibold">{{ item.description }}</td>
+                        <td><code>{{ item.catalog_item.item_code|default:'Non-Catalog / Custom' }}</code></td>
+                        <td><span class="badge bg-secondary">{{ item.quantity }}</span></td>
+                        <td>₹{{ item.unit_price|intcomma }}</td>
+                        <td class="fw-bold text-dark">₹{{ item.total_price|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">No line items added yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal or Section -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-light fw-bold small text-secondary">
+        <i class="bi bi-plus-circle me-1"></i>Add Equipment Item to Requisition
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">DEFENSE CATALOG ITEM</label>
+                    {{ item_form.catalog_item }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">DESCRIPTION</label>
+                    {{ item_form.description }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">QTY</label>
+                    {{ item_form.quantity }}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">UNIT PRICE (INR)</label>
+                    {{ item_form.unit_price }}
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" name="add_item" class="btn btn-dark btn-sm w-100">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

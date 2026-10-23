@@ -1,0 +1,35 @@
+# Python virtual environment
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Django generated
+*.sqlite3
+staticfiles/
+media/
+
+# Environment / credentials
+.env
+*.env.local
+*.env.production
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# CI/CD artifacts
+.gitlab/
+*.log
+*.bak

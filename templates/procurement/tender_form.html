@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-megaphone-fill me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">TENDER / RFP NUMBER *</label>
+                            {{ form.tender_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">LINKED REQUISITION (OPTIONAL)</label>
+                            {{ form.requisition }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">TENDER TITLE / SCOPE HEADING *</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">TENDER TYPE *</label>
+                            {{ form.tender_type }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">REQUIRED SECURITY CLEARANCE *</label>
+                            {{ form.security_clearance_required }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">ESTIMATED VALUE (INR) *</label>
+                            {{ form.estimated_value }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">PUBLICATION DATE *</label>
+                            {{ form.publication_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">SUBMISSION DEADLINE CUTOFF *</label>
+                            {{ form.submission_deadline }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">TECHNICAL SCOPE OF WORK & STANDARDS *</label>
+                            {{ form.scope_of_work }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">SPECIAL DEFENSE TERMS & DAP LIQUIDATED DAMAGES CLAUSES</label>
+                            {{ form.terms_and_conditions }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'tender_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-broadcast me-1 text-warning"></i> Issue & Publish Defense Tender
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

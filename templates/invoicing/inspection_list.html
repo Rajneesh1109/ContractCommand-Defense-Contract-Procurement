@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}DD-250 Inspections // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <h3 class="fw-bold mb-1 text-slate-900">
+            <i class="bi bi-patch-check-fill text-warning me-2"></i>DD-250 Material Inspection & Receiving Certificates
+        </h3>
+        <p class="text-muted mb-0 small">
+            Official military quality acceptance, bench test reports, environmental stress screenings, and cryptographic inspection signatures.
+        </p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{% url 'inspection_create' %}" class="btn btn-dark btn-sm">
+            <i class="bi bi-patch-check text-warning me-1"></i>Conduct Inspection
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body bg-white p-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-6">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search Certificate #, QA report, contract, location..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Acceptance Results</option>
+                    {% for code, label in statuses %}
+                        <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-dark btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Inspections Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-header card-header-tactical">
+        <i class="bi bi-card-checklist me-2 text-warning"></i>Inspection Logs & Certified DD-250 Documents ({{ certificates|length }})
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>DD-250 Number</th>
+                        <th>Contract & Milestone</th>
+                        <th>Quality Inspector</th>
+                        <th>Date & Test Location</th>
+                        <th>QA Report #</th>
+                        <th>Result</th>
+                        <th>Digital Signature</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in certificates %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'inspection_detail' pk=c.pk %}" class="fw-bold text-decoration-none text-dark">
+                                {{ c.certificate_number }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'contract_detail' pk=c.contract.pk %}" class="text-decoration-none fw-semibold">
+                                {{ c.contract.contract_number }}
+                            </a>
+                            <small class="text-muted d-block">{{ c.milestone.title }}</small>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ c.inspector.get_full_name|default:c.inspector.username }}</div>
+                            <small class="text-muted">{{ c.inspector.department }}</small>
+                        </td>
+                        <td>
+                            <div>{{ c.inspection_date }}</div>
+                            <small class="text-muted">{{ c.inspection_location|truncatechars:35 }}</small>
+                        </td>
+                        <td><code>{{ c.qa_report_number|default:'DGQA-DIR-2026' }}</code></td>
+                        <td>
+                            {% if c.status == 'PASSED' %}
+                                <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-check-circle me-1"></i>Passed</span>
+                            {% elif c.status == 'CONDITIONALLY_PASSED' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning">Conditional</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td><code style="font-size: 0.72rem;">{{ c.digital_signature|truncatechars:14 }}</code></td>
+                        <td>
+                            <a href="{% url 'inspection_detail' pk=c.pk %}" class="btn btn-xs btn-outline-dark">
+                                View DD-250 <i class="bi bi-printer"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">No inspection certificates recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

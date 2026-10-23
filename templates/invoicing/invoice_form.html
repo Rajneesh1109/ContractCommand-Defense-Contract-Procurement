@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-receipt me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <div class="alert alert-info py-2 small mb-4">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    A 5% warranty retention will be automatically withheld as per DAP 2020 standard defense contract payment terms.
+                    Link to the approved DD-250 inspection certificate to enable 3-Way Match verification.
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">INVOICE NUMBER *</label>
+                            {{ form.invoice_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">PRIME DEFENSE VENDOR *</label>
+                            {{ form.vendor }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE CONTRACT *</label>
+                            {{ form.contract }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">CLAIMED MILESTONE</label>
+                            {{ form.milestone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DD-250 INSPECTION CERTIFICATE</label>
+                            {{ form.inspection_cert }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-secondary">INVOICE DATE *</label>
+                            {{ form.invoice_date }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-secondary">PAYMENT DUE DATE *</label>
+                            {{ form.due_date }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">GROSS CLAIM AMOUNT (INR) *</label>
+                            {{ form.gross_amount }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">GST / TAX (0 for Exempted)</label>
+                            {{ form.tax_amount }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">WARRANTY RETENTION %</label>
+                            {{ form.withholding_retention_pct }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">CLAIM REMARKS</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'invoice_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-receipt me-1 text-warning"></i> Submit Defense Payment Claim
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

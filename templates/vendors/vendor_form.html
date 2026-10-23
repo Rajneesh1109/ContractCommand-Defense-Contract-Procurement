@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-shield-plus me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Company & Registration Data</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">CONTRACTOR / ENTITY NAME *</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE VENDOR CODE *</label>
+                            {{ form.vendor_code }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">CAGE / NCAGE CODE</label>
+                            {{ form.cage_code }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">D-U-N-S NUMBER</label>
+                            {{ form.duns_number }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE DOMAIN / CATEGORY *</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">SUPPLIER TIER</label>
+                            {{ form.tier }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">REGISTRATION STATUS</label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Security Clearances & Compliance</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">FACILITY CLEARANCE LEVEL *</label>
+                            {{ form.security_clearance }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">CLEARANCE EXPIRY DATE</label>
+                            {{ form.clearance_expiry }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">INITIAL PERFORMANCE RATING (0-100)</label>
+                            {{ form.performance_rating }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small text-secondary">QUALITY & INDUSTRIAL CERTIFICATIONS</label>
+                            {{ form.certifications }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center mt-4">
+                            <div class="form-check">
+                                {{ form.itar_compliant }}
+                                <label class="form-check-label fw-semibold small text-dark ms-1">ITAR / EAR Export Control Compliant</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Liaison Contact Information</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">KEY DEFENSE LIAISON</label>
+                            {{ form.contact_person }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">OFFICIAL EMAIL</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">SECURE PHONE</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small text-secondary">FACILITY ADDRESS</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">COUNTRY</label>
+                            {{ form.country }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'vendor_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-save me-1 text-warning"></i> Save Contractor Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

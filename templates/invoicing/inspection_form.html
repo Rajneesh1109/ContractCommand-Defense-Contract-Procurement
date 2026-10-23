@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-patch-check me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <div class="alert alert-info py-2 small mb-4">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Conduct an official DGQA / military quality inspection. After passing DD-250 certification, the milestone becomes eligible for invoice generation.
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DD-250 CERTIFICATE NUMBER *</label>
+                            {{ form.certificate_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">QA / RANGE TEST REPORT REF</label>
+                            {{ form.qa_report_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE CONTRACT *</label>
+                            {{ form.contract }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">MILESTONE / DELIVERABLE *</label>
+                            {{ form.milestone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">INSPECTION DATE *</label>
+                            {{ form.inspection_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">ACCEPTANCE RESULT *</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">TESTING FACILITY / PROVING GROUND</label>
+                            {{ form.inspection_location }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">TECHNICAL FINDINGS, BENCH TEST READINGS & MIL-SPEC CONFORMANCE *</label>
+                            {{ form.findings_and_notes }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'inspection_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-patch-check-fill me-1 text-warning"></i> Certify & Issue DD-250 (Digital Stamp)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

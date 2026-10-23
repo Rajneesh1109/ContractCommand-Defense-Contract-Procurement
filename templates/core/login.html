@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Secure Defense Access // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white text-center py-4 border-bottom border-warning">
+                <i class="bi bi-shield-shaded text-warning fs-1"></i>
+                <h4 class="mt-2 mb-0 fw-bold">ContractCommand</h4>
+                <small class="text-secondary text-uppercase tracking-wider">Defense Contract & Procurement</small>
+            </div>
+            
+            <div class="card-body p-4 bg-white">
+                <div class="text-center mb-3">
+                    <span class="badge bg-danger-subtle text-danger border border-danger fw-semibold px-2 py-1">
+                        <i class="bi bi-lock-fill me-1"></i>RESTRICTED MILITARY ACCESS
+                    </span>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">SERVICE ID / USERNAME</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
+                            {{ form.username }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">SECURITY ACCESS CREDENTIAL</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                            {{ form.password }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2 fw-bold shadow-sm mt-2">
+                        <i class="bi bi-shield-check text-warning me-1"></i> Authenticate & Enter Portal
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-footer bg-light p-3 small text-muted">
+                <div class="fw-bold text-dark mb-1"><i class="bi bi-info-circle me-1 text-primary"></i>Demo User Accounts (Password: <code>Admin@1234</code>):</div>
+                <div class="d-flex flex-wrap gap-1 mt-1">
+                    <button type="button" class="btn btn-xs btn-outline-dark" onclick="fillCreds('admin')">Admin</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCreds('rajesh_sharma')">Procurement</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCreds('vikram_malhotra')">Contracting</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCreds('sunita_rao')">Inspector</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" onclick="fillCreds('ajay_mehra')">Finance</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillCreds(u) {
+    document.getElementById('id_username').value = u;
+    document.getElementById('id_password').value = 'Admin@1234';
+}
+</script>
+{% endblock %}

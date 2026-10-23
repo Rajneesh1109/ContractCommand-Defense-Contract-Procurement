@@ -1,0 +1,151 @@
+:root {
+  --mil-slate-900: #0f172a;
+  --mil-slate-800: #1e293b;
+  --mil-slate-700: #334155;
+  --mil-slate-600: #475569;
+  --mil-gold: #f59e0b;
+  --mil-gold-dark: #d97706;
+  --mil-accent: #0284c7;
+  --mil-bg: #f8fafc;
+}
+
+body {
+  background-color: var(--mil-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1e293b;
+}
+
+.top-defense-banner {
+  background-color: #0b1120;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.navbar-tactical {
+  background-color: var(--mil-slate-900);
+  border-bottom: 2px solid var(--mil-gold-dark);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-tactical .navbar-brand {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff !important;
+}
+
+.navbar-tactical .nav-link {
+  color: #cbd5e1 !important;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.navbar-tactical .nav-link:hover,
+.navbar-tactical .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.stat-card {
+  border: none;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .card-accent-bar {
+  height: 4px;
+  width: 100%;
+}
+
+.clearance-top-secret {
+  background-color: #991b1b;
+  color: #ffffff;
+}
+
+.clearance-secret {
+  background-color: #ea580c;
+  color: #ffffff;
+}
+
+.clearance-confidential {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.clearance-unclassified {
+  background-color: #475569;
+  color: #ffffff;
+}
+
+.badge-defense {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.35em 0.65em;
+  border-radius: 4px;
+}
+
+.btn-tactical {
+  background-color: var(--mil-slate-900);
+  color: #ffffff;
+  border: 1px solid var(--mil-slate-700);
+  font-weight: 600;
+}
+
+.btn-tactical:hover {
+  background-color: var(--mil-slate-800);
+  color: var(--mil-gold);
+}
+
+.btn-gold {
+  background-color: var(--mil-gold-dark);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-gold:hover {
+  background-color: #b45309;
+  color: #ffffff;
+}
+
+.card-header-tactical {
+  background-color: var(--mil-slate-800);
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--mil-slate-700);
+}
+
+/* Printable DD-250 Form styling */
+@media print {
+  body {
+    background-color: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .card {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+  }
+}

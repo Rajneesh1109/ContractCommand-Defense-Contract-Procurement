@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ tender.tender_number }} // Tender Notice{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-dark">{{ tender.tender_number }}</span>
+            <span class="badge badge-defense clearance-{{ tender.security_clearance_required|lower }}">
+                Clearance Req: {{ tender.get_security_clearance_required_display }}
+            </span>
+            <span class="badge bg-secondary">{{ tender.get_tender_type_display }}</span>
+        </div>
+        <h3 class="fw-bold mb-0 text-dark">{{ tender.title }}</h3>
+        <p class="text-muted small mb-0">Est. Value: <strong>₹{{ tender.estimated_value|intcomma }}</strong> | Deadline: <strong class="text-danger">{{ tender.submission_deadline }}</strong></p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{% url 'tender_list' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to Tenders
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Tender Scope Details -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-file-earmark-text me-2 text-warning"></i>Tender Specifications & Scope of Work
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold small text-secondary text-uppercase">Technical Scope</h6>
+                <p class="text-secondary small">{{ tender.scope_of_work }}</p>
+
+                {% if tender.terms_and_conditions %}
+                <h6 class="fw-bold small text-secondary text-uppercase mt-4">Terms, Conditions & DAP Clauses</h6>
+                <p class="text-secondary small">{{ tender.terms_and_conditions }}</p>
+                {% endif %}
+
+                <div class="row g-3 mt-2 pt-3 border-top small">
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Published Date:</span>
+                        <strong>{{ tender.publication_date }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="text-muted d-block">Submission Cutoff:</span>
+                        <strong class="text-danger">{{ tender.submission_deadline }}</strong>
+                    </div>
+                    {% if tender.requisition %}
+                    <div class="col-md-12">
+                        <span class="text-muted d-block">Derived from Procurement Requisition:</span>
+                        <a href="{% url 'requisition_detail' pk=tender.requisition.pk %}">
+                            {{ tender.requisition.requisition_number }} - {{ tender.requisition.title }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Bid Box -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-envelope-plus me-2 text-warning"></i>Submit Contractor Bid
+            </div>
+            <div class="card-body">
+                {% if tender.status != 'AWARDED' and tender.status != 'CANCELLED' %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">BIDDING DEFENSE VENDOR *</label>
+                        {{ bid_form.vendor }}
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">COMMERCIAL BID (INR) *</label>
+                            {{ bid_form.bid_amount }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">DELIVERY TIMELINE (MOS)</label>
+                            {{ bid_form.delivery_timeline_months }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-secondary">EVALUATION NOTES / COMMENTS</label>
+                        {{ bid_form.evaluation_notes }}
+                    </div>
+                    <div class="form-check mb-3">
+                        {{ bid_form.technical_compliance }}
+                        <label class="form-check-label small fw-semibold text-dark">Vendor certifies 100% Mil-Spec Technical Compliance</label>
+                    </div>
+
+                    <button type="submit" name="submit_bid" class="btn btn-dark btn-sm w-100 fw-bold">
+                        <i class="bi bi-file-earmark-check text-warning me-1"></i> Register Commercial Bid
+                    </button>
+                </form>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-award-fill fs-3 text-success me-2"></i>
+                    <strong>Tender Concluded & Awarded</strong>
+                    <p class="small text-muted mb-0 mt-1">This tender has completed evaluation and the prime contractor has been selected.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Submitted Bids Table & Award L1 Button -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header card-header-tactical d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-cash-coin me-2 text-warning"></i>Submitted Vendor Bids ({{ bids|length }})</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-uppercase">
+                    <tr>
+                        <th>Contractor</th>
+                        <th>Bid Amount (INR)</th>
+                        <th>Delivery Schedule</th>
+                        <th>Mil-Spec Compliant</th>
+                        <th>Status</th>
+                        <th>Award Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bid in bids %}
+                    <tr {% if bid.bid_status == 'ACCEPTED_L1' %}class="table-success"{% endif %}>
+                        <td>
+                            <a href="{% url 'vendor_detail' pk=bid.vendor.pk %}" class="fw-bold text-decoration-none text-dark">
+                                {{ bid.vendor.name }}
+                            </a>
+                            <small class="text-muted d-block">{{ bid.vendor.vendor_code }} | Rating: {{ bid.vendor.performance_rating }}%</small>
+                        </td>
+                        <td class="fw-bold fs-6">₹{{ bid.bid_amount|intcomma }}</td>
+                        <td>{{ bid.delivery_timeline_months }} Months</td>
+                        <td>
+                            {% if bid.technical_compliance %}
+                                <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Compliant</span>
+                            {% else %}
+                                <span class="badge bg-danger">Non-Compliant</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if bid.bid_status == 'ACCEPTED_L1' %}
+                                <span class="badge bg-success fs-6"><i class="bi bi-trophy-fill me-1"></i>L1 Winner</span>
+                            {% elif bid.bid_status == 'REJECTED' %}
+                                <span class="badge bg-danger">Disqualified</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ bid.get_bid_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if tender.status != 'AWARDED' and bid.technical_compliance %}
+                            <form method="post" action="{% url 'tender_award' pk=tender.pk bid_pk=bid.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-xs btn-outline-success fw-bold" onclick="return confirm('Award defense contract to {{ bid.vendor.name }} for ₹{{ bid.bid_amount|intcomma }}?')">
+                                    <i class="bi bi-award-fill me-1"></i>Select L1 Award
+                                </button>
+                            </form>
+                            {% elif bid.bid_status == 'ACCEPTED_L1' %}
+                            <span class="text-success fw-bold small"><i class="bi bi-check2-all"></i> Prime Awardee</span>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No contractor bids received yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

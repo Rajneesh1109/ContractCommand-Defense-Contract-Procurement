@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} // ContractCommand{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0">
+            <div class="card-header card-header-tactical">
+                <i class="bi bi-file-earmark-plus me-2 text-warning"></i>{{ title }}
+            </div>
+            <div class="card-body p-4 bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Core Contract Identification</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">CONTRACT NUMBER *</label>
+                            {{ form.contract_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">CONTRACTING OFFICER</label>
+                            {{ form.contracting_officer }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">CONTRACT TITLE / OPERATIONAL SCOPE *</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">PRIME DEFENSE VENDOR *</label>
+                            {{ form.vendor }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-secondary">ORIGINATING TENDER / RFP (OPTIONAL)</label>
+                            {{ form.tender }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">DEFENSE DOMAIN / CATEGORY *</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">SECURITY CLASSIFICATION *</label>
+                            {{ form.security_classification }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">LIFECYCLE STAGE *</label>
+                            {{ form.contract_status }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Financial Terms & Operational Period</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small text-secondary">TOTAL CONTRACT VALUE *</label>
+                            {{ form.total_contract_value }}
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold small text-secondary">CURRENCY</label>
+                            {{ form.currency }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-secondary">EFFECTIVE START DATE *</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small text-secondary">COMPLETION DUE DATE *</label>
+                            {{ form.end_date }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small text-secondary">PROCUREMENT FRAMEWORK / CLAUSE</label>
+                            {{ form.procurement_clause }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center mt-4">
+                            <div class="form-check">
+                                {{ form.itar_controlled }}
+                                <label class="form-check-label fw-semibold small text-dark ms-1">ITAR / EAR Export Restrictions Apply</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-secondary fw-bold border-bottom pb-2 mb-3">Scope Specifications & Security Guidelines</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">DETAILED SCOPE OF WORK & DELIVERABLES *</label>
+                            {{ form.scope_of_contract }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-secondary">FACILITY SECURITY & AIR-GAP GUIDELINES</label>
+                            {{ form.security_guidelines }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-end">
+                        <a href="{% url 'contract_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="bi bi-save me-1 text-warning"></i> Save Defense Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
